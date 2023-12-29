@@ -14,7 +14,7 @@ namespace MainAgent {
         private Transform[] parts;
         private Goal goal;
         private Network network;
-
+        
         public float strength = 10000;
         public float speed = 100;
         private float time = 0f;
@@ -66,6 +66,7 @@ namespace MainAgent {
             goal = target.GetComponent<Goal>();
 
             OnEpisodeBegin();
+            Population.instance.Add(this);
         }
 
         public void OnEpisodeBegin() {
@@ -194,7 +195,6 @@ namespace MainAgent {
                     joint.targetVelocity = -speed;
                 }
                 t.motor = joint;
-                Debug.Log("new speed: " + t.motor.targetVelocity + " strength " + t.motor.force);
             } else {
                 JointMotor joint = t.motor;
                 joint.targetVelocity = 0;

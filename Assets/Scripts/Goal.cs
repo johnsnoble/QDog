@@ -10,14 +10,16 @@ public class Goal : MonoBehaviour
     private AgentScript script;
     private float spawnDistance = 50;
     private Transform target;
-    public void Start() {
-        script = agent.GetComponent<AgentScript>();
+
+    public void Awake() {
         target = gameObject.transform;
+    }
+    public void Start() {
         respawn(agentBody.position, agentBody.rotation);
     }
     private void OnTriggerEnter(Collider col) {
         if (col.tag != "Wall" && col.tag != "Ground") {
-            Debug.Log("Goal reached!");
+            //Debug.Log("Goal reached!");
             respawn(agentBody.position, agentBody.rotation);
         }
     }
@@ -25,7 +27,7 @@ public class Goal : MonoBehaviour
         float x = Random.Range(-spawnDistance, spawnDistance);
         float y = Random.Range(-spawnDistance, spawnDistance);
         Vector3 newPos = new Vector3(x, 5, y);
-        Debug.Log("new position is " + newPos);
+        //Debug.Log("new position is " + newPos);
         target.localPosition = newPos;
     }
 

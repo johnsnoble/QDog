@@ -13,7 +13,7 @@ public class Delicate : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision) {
         if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Wall") {
-            Debug.Log("episode terminated from "+gameObject.name);
+            //Debug.Log("episode terminated from "+gameObject.name);
         }
     }
 }
