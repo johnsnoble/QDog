@@ -4,23 +4,23 @@ using UnityEngine;
 
 namespace MainAgent {
     public class AgentScript : MonoBehaviour {
-        public Transform target;
         public Transform body;
         public Transform fr3100, fl3100, br3100, bl3100, fr3200, fl3200, br3200, bl3200;
         public Transform fr3300, fl3300, br3300, bl3300, fr3400, fl3400, br3400, bl3400;
         public Transform fr3500, fl3500, br3500, bl3500;
-        private Vector3[] original_position;
         public HingeJoint[,] servo;
-        private Transform[] parts;
-        private Goal goal;
-        private Network network;
-        
         public float strength = 10000;
         public float speed = 100;
+        public Transform plane;
+        public Material awakeColour, asleepColour;
+
+        private Vector3[] original_position;
+        private Transform[] parts;
+        private Network network;
+        private bool awake;
         private float time = 0f;
 
         public void Start() {
-            network = new Network(12);
             servo = new HingeJoint[3, 4];
             servo[0, 0] = fr3100.GetComponent<HingeJoint>();
             servo[0, 1] = fl3100.GetComponent<HingeJoint>();
@@ -63,51 +63,22 @@ namespace MainAgent {
                 original_position[i] = parts[i].position;
             }
 
-            goal = target.GetComponent<Goal>();
 
             OnEpisodeBegin();
-            Population.instance.Add(this);
+            Population.instance.addAgent(this);
+            network = Population.instance.getNetwork();
+            awake = (network == null) ? false : true;
+            updateMaterial();
         }
 
         public void OnEpisodeBegin() {
-            Transform old = parts[0];
-            for (int i=0; i < 21; i++) {
+            for (int i = 0; i < 21; i++) {
                 parts[i].GetComponent<Rigidbody>().isKinematic = true;
             }
 
             for (int i = 0; i < 21; i++) {
                 parts[i].position = original_position[i];
-            }
-
-            body.rotation = Quaternion.identity;
-            fr3100.rotation = Quaternion.identity;
-            fl3100.rotation = Quaternion.identity;
-            br3100.rotation = Quaternion.identity;
-            bl3100.rotation = Quaternion.identity;
-            fr3200.rotation = Quaternion.identity;
-            fl3200.rotation = Quaternion.identity;
-            br3200.rotation = Quaternion.identity;
-            bl3200.rotation = Quaternion.identity;
-            fr3300.rotation = Quaternion.identity;
-            fl3300.rotation = Quaternion.identity;
-            br3300.rotation = Quaternion.identity;
-            bl3300.rotation = Quaternion.identity;
-            fr3400.rotation = Quaternion.identity;
-            fl3400.rotation = Quaternion.identity;
-            br3400.rotation = Quaternion.identity;
-            bl3400.rotation = Quaternion.identity;
-            fr3500.rotation = Quaternion.identity;
-            fl3500.rotation = Quaternion.identity;
-            br3500.rotation = Quaternion.identity;
-            bl3500.rotation = Quaternion.identity;
-
-            foreach (HingeJoint i in servo) {
-                i.useLimits = true;
-                i.useMotor = true;
-                JointMotor joint = i.motor;
-                joint.force = strength;
-                joint.targetVelocity = 0;
-                i.motor = joint;
+                parts[i].rotation = Quaternion.identity;
             }
 
             for (int i = 0; i < 3; i++) {
@@ -125,64 +96,27 @@ namespace MainAgent {
                 parts[i].GetComponent<Rigidbody>().isKinematic = false;
             }
 
-            goal.respawn(old.position, old.rotation);
-        }
-
-        public void CollectObservations(Sensor sensor) {
-            sensor.AddObservation(transform.localPosition);
-            sensor.AddObservation(target.localPosition);
-
-            Rigidbody rb = body.GetComponent<Rigidbody>();
-            sensor.AddObservation(rb.angularVelocity);
-            sensor.AddObservation(rb.rotation);
-            sensor.AddObservation(rb.velocity);
-
-            foreach (HingeJoint i in servo) {
-                sensor.AddObservation(i.angle);
-            }
         }
 
         public void OnActionReceived(Action actions) {
-            int i = -1;
-            moveMotor(servo[0, 0], actions.ContinuousActions[++i]);
-            moveMotor(servo[0, 1], actions.ContinuousActions[++i]);
-            moveMotor(servo[0, 2], actions.ContinuousActions[++i]);
-            moveMotor(servo[0, 3], actions.ContinuousActions[++i]);
-            moveMotor(servo[1, 0], actions.ContinuousActions[++i]);
-            moveMotor(servo[1, 1], actions.ContinuousActions[++i]);
-            moveMotor(servo[1, 2], actions.ContinuousActions[++i]);
-            moveMotor(servo[1, 3], actions.ContinuousActions[++i]);
-            moveMotor(servo[2, 0], actions.ContinuousActions[++i]);
-            moveMotor(servo[2, 1], actions.ContinuousActions[++i]);
-            moveMotor(servo[2, 2], actions.ContinuousActions[++i]);
-            moveMotor(servo[2, 3], actions.ContinuousActions[++i]);
+            int k = 0;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    moveMotor(servo[i, j], actions.actions[k++]);
+                }
+            }
         }
 
         public void Update() {
-            //AddReward(+0.01f);
-            /*Vector3 facing = body.rotation * Vector3.forward;
-            Vector3 toTarget = target.position - body.position;
-            float angle = Mathf.Acos(Vector3.Dot(facing, toTarget) / facing.magnitude / toTarget.magnitude);
-            float tol = Mathf.PI / 5;
-            if (angle > Mathf.PI / 5) {
-                AddReward(-0.01f * (angle - tol));
-            }
-            Debug.Log("height is "+parts[0].position.y);
-            if (parts[0].position.y > 19) {
-                AddReward(0.02f);
-            } else {
-                AddReward(-0.01f);
-            }*/
             time += Time.deltaTime;
-            network.Update();
-            OnActionReceived(network.GetAction(time));
-        }
-
-        public float toFloat(bool boolean) {
-            if (boolean) {
-                return 1;
+            if (awake) { OnActionReceived(network.GetAction(time)); }
+            if (time >= Population.episodeLength) {
+                network = Population.instance.getNetwork();
+                awake = (network == null) ? false : true;
+                updateMaterial();
+                OnEpisodeBegin();
+                time = 0;
             }
-            return 0;
         }
 
         public void moveMotor(HingeJoint t, float value, float tol = 0.1f) {
@@ -200,6 +134,10 @@ namespace MainAgent {
                 joint.targetVelocity = 0;
                 t.motor = joint;
             }
+        }
+
+        private void updateMaterial() {
+            plane.GetComponent<MeshRenderer>().material = awake ? awakeColour : asleepColour;
         }
     }
 }

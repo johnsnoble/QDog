@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class Action
 {
-    public float[] ContinuousActions;
+    public float[] actions;
 
     public Action(int n) {
-        ContinuousActions = new float[n];
+        actions = new float[n];
         for (int i=0; i<n; i++) {
-            ContinuousActions[i] = 0;
+            actions[i] = 0;
         }
     }
 }

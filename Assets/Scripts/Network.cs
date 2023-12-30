@@ -10,9 +10,9 @@ public class Network
     private int[,] genotype;
     private Dictionary<int, float> pMap;
 
-    public Network(int x) {
+    public Network() {
         sensor = new Sensor();
-        action = new Action(x);
+        action = new Action(12);
         genotype = new int[12, 2];
         for (int i=0; i<12; i++) {
             for (int j=0; j<2; j++) {
@@ -28,14 +28,12 @@ public class Network
         pMap.Add(4, 1f);
     }
 
-    public void Update() {
-    }
-
     public Action GetAction(float time) {
-        for (int i=0; i<action.ContinuousActions.Length; i++) {
-            action.ContinuousActions[i] = (float)(genotype[i, 0] * Math.Tanh(
+        for (int i=0; i<action.actions.Length; i++) {
+            float val = (float)(genotype[i, 0] * Math.Tanh(
                 4 * Mathf.Sin(2f * Mathf.PI * (time + genotype[i, 1]))
                 ));
+            action.actions[i] = (val + 1) / 2;
         }
         return action;
     }
