@@ -5,13 +5,11 @@ using System;
 
 public class Network
 {
-    private Sensor sensor;
     private Action action;
     private int[,] genotype;
     private Dictionary<int, float> pMap;
 
     public Network() {
-        sensor = new Sensor();
         action = new Action(12);
         genotype = new int[12, 2];
         for (int i=0; i<12; i++) {
@@ -21,6 +19,7 @@ public class Network
         }
 
         pMap = new Dictionary<int, float>();
+        // 5 options for each parameter
         pMap.Add(0, 0f);
         pMap.Add(1, 0.25f);
         pMap.Add(2, 0.5f);
@@ -29,6 +28,7 @@ public class Network
     }
 
     public Action GetAction(float time) {
+        // calculate action for each joint and return value between 0-1
         for (int i=0; i<action.actions.Length; i++) {
             float val = (float)(genotype[i, 0] * Math.Tanh(
                 4 * Mathf.Sin(2f * Mathf.PI * (time + genotype[i, 1]))

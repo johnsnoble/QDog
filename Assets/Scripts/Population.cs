@@ -21,12 +21,6 @@ public class Population : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-// Debug.Log("there is " + agents.Count + " agents");
-    }
-
     public Network getNetwork() {
         if (testQueue.TryDequeue(out Network net)) {
             return net;

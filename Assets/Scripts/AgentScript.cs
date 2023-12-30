@@ -21,6 +21,7 @@ namespace MainAgent {
         private float time = 0f;
 
         public void Start() {
+            // store joints and bodies to a more usable format
             servo = new HingeJoint[3, 4];
             servo[0, 0] = fr3100.GetComponent<HingeJoint>();
             servo[0, 1] = fl3100.GetComponent<HingeJoint>();
@@ -58,29 +59,37 @@ namespace MainAgent {
             parts[19] = br3500;
             parts[20] = bl3500;
 
+            // save original position so we can reset later
             original_position = new Vector3[21];
             for (int i=0; i<21; i++) {
                 original_position[i] = parts[i].position;
             }
 
-
-            OnEpisodeBegin();
+            // give population manager a reference to this agent (executor)
             Population.instance.addAgent(this);
+            // Try get a network (task) to execute
             network = Population.instance.getNetwork();
             awake = (network == null) ? false : true;
             updateMaterial();
+
+            // Set initial state
+            OnEpisodeBegin();
+            
         }
 
         public void OnEpisodeBegin() {
+            // Freeze body (probably not neccessary)
             for (int i = 0; i < 21; i++) {
                 parts[i].GetComponent<Rigidbody>().isKinematic = true;
             }
 
+            //reset position and rotation
             for (int i = 0; i < 21; i++) {
                 parts[i].position = original_position[i];
                 parts[i].rotation = Quaternion.identity;
             }
 
+            // reset each motor to be static
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     servo[i, j].useLimits = true;
@@ -92,6 +101,7 @@ namespace MainAgent {
                 }
             }
 
+            //unfreeze everything
             for (int i = 0; i < 21; i++) {
                 parts[i].GetComponent<Rigidbody>().isKinematic = false;
             }
@@ -108,14 +118,16 @@ namespace MainAgent {
         }
 
         public void Update() {
+            // increment time and if awake get next action by updating network
             time += Time.deltaTime;
             if (awake) { OnActionReceived(network.GetAction(time)); }
             if (time >= Population.episodeLength) {
+                // Once its time for the episode to stop we try get the next network and repeat
                 network = Population.instance.getNetwork();
                 awake = (network == null) ? false : true;
                 updateMaterial();
                 OnEpisodeBegin();
-                time = 0;
+                time = 0f;
             }
         }
 
