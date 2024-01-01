@@ -11,13 +11,14 @@ public class Population : MonoBehaviour
     private ConcurrentQueue<Network> testQueue;
 
     private List<MainAgent.AgentScript> agents = new List<MainAgent.AgentScript>();
+    private List<Network> population = new List<Network>();
 
     private void Awake() {
         instance = this;
         testQueue = new ConcurrentQueue<Network>();
         // TEMPORARY: Create 100 networks and add to queue
         for (int i = 0; i < 100; i++) {
-            testQueue.Enqueue(new Network());
+            addToPopulation(new Network());
         }
     }
 
@@ -30,5 +31,10 @@ public class Population : MonoBehaviour
 
     public void addAgent(MainAgent.AgentScript agent) {
         agents.Add(agent);
+    }
+
+    private void addToPopulation(Network n) {
+        population.Add(n);
+        testQueue.Enqueue(n);
     }
 }

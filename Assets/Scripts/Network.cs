@@ -8,6 +8,8 @@ public class Network
     private Action action;
     private int[,] genotype;
     private Dictionary<int, float> pMap;
+    private float quality;
+    private Vector3 end;
 
     public Network() {
         action = new Action(12);
@@ -36,5 +38,25 @@ public class Network
             action.actions[i] = (val + 1) / 2;
         }
         return action;
+    }
+
+    public float distance(Network n) {
+        return Vector3.Distance(n.getEnd(), end);
+    }
+
+    public float getQuality() {
+        return quality;
+    }
+
+    public Vector3 getEnd() {
+        return end;
+    }
+
+    public void setQuality(float quality) {
+        this.quality = quality;
+    }
+
+    public void setEnd(Vector3 end) {
+        this.end = end;
     }
 }
