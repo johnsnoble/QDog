@@ -33,7 +33,7 @@ public class Archive
 
         foreach (Network network in archive) {
             near.Enqueue(network);
-            while (near.Count > k) near.Dequeue();
+            if (near.Count > k) near.Dequeue();
             float d = n.distance(network);
             if (d < dist) {
                 closest = network;
@@ -43,7 +43,7 @@ public class Archive
 
         foreach (Network network in population) {
             near.Enqueue(network);
-            while (near.Count > k) near.Dequeue();
+            if (near.Count > k) near.Dequeue();
         }
 
         float novelty = 0;
@@ -56,7 +56,7 @@ public class Archive
     }
 
     public void archiveManagement(Network n, float novelty, Network closest) {
-        Debug.Log("novelty: " + novelty);
+        Debug.Log("novelty: " + novelty); 
         if (closest != null && n.getQuality() > closest.getQuality()) {
             archive.Remove(closest);
             archive.Add(n);

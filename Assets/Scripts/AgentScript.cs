@@ -126,6 +126,7 @@ namespace MainAgent {
                 if (network != null) {
                     network.setEnd(body.position);
                     network.setQuality(0);
+                    Population.cde.Signal();
                 }
                 network = Population.instance.getNetwork();
                 awake = (network == null) ? false : true;
