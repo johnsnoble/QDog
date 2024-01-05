@@ -18,7 +18,7 @@ class PriorityQueue<T> {
     public void Enqueue(T x) {
         list.Add(x);
         int i = Count - 1;
-
+         
         while (i > 0) {
             int p = (i - 1) / 2;
             if (comparer.Compare(list[p], x) < 1) break;

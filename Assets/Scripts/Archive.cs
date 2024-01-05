@@ -5,9 +5,10 @@ using UnityEngine;
 public class Archive
 {
     private List<Network> archive;
-    private int k, threshold;
+    private int k;
+    private float threshold;
 
-    public Archive(int k, int threshold) {
+    public Archive(int k, float threshold) {
         archive = new List<Network>();
         this.k = k;
         this.threshold = threshold;
@@ -26,31 +27,44 @@ public class Archive
     }
 
     public (float, Network) objectivesUpdate(Network n, List<Network> population) {
-        PriorityQueue<Network> near = new PriorityQueue<Network>((IComparer<Network>) new NearnessComparer(n));
+        List<Network> near = new List<Network>();
+        Network closest = null;
+        float dist = float.MaxValue;
+
         foreach (Network network in archive) {
-            near.Enqueue(network);
-            while (near.Count > k) near.Dequeue();
+            near.Add(network);
+            float d = n.distance(network);
+            if (d < dist) {
+                closest = network;
+                dist = d;
+            }
         }
 
         foreach (Network network in population) {
-            near.Enqueue(network);
-            while (near.Count > k) near.Dequeue();
+            near.Add(network);
         }
 
+        near.Sort((x, y) => n.distance(x).CompareTo(n.distance(y)));
+        near.RemoveRange(k, near.Count - k);
         float novelty = 0;
         float count = near.Count;
         if (count == 0) return (0, null);
 
-        Network closest = near.Peek();
-        while (near.Count > 0) count += n.distance(near.Dequeue());
-        novelty /= count;
+        foreach (Network net in near) novelty += n.distance(net);
+        novelty /= near.Count;
         return (novelty, closest);
     }
 
-    public void archiveManagement(float novelty, Network n, Network closest) {
-        if (n.getQuality() > closest.getQuality()) {
+    public void archiveManagement(Network n, float novelty, Network closest) {
+        if (closest != null && n.getQuality() >= closest.getQuality()) {
             archive.Remove(closest);
             archive.Add(n);
-        } else if (novelty > threshold) archive.Add(n);
+        } else {
+            if (novelty > threshold || closest == null) archive.Add(n);
+        }
+    }
+
+    public int getArchiveSize() {
+        return archive.Count;
     }
 }

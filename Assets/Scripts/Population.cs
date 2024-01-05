@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using UnityEngine;
@@ -12,6 +13,8 @@ public class Population : MonoBehaviour
 
     private List<MainAgent.AgentScript> agents = new List<MainAgent.AgentScript>();
     private List<Network> population = new List<Network>();
+    private Archive archive;
+    private float time = 0f;
 
     private void Awake() {
         instance = this;
@@ -19,6 +22,19 @@ public class Population : MonoBehaviour
         // TEMPORARY: Create 100 networks and add to queue
         for (int i = 0; i < 100; i++) {
             addToPopulation(new Network());
+        }
+        archive = new Archive(15, 1000f);
+    }
+
+    private void Update() {
+        time += Time.deltaTime;
+        if (time > episodeLength * Math.Ceiling((double)population.Count / agents.Count)) {
+            foreach (Network n in population) {
+                (float, Network) res = archive.objectivesUpdate(n, population);
+                archive.archiveManagement(n, res.Item1, res.Item2);
+                enabled = false;
+            }
+            print("archive size: " + archive.getArchiveSize());
         }
     }
 
@@ -31,6 +47,13 @@ public class Population : MonoBehaviour
 
     public void addAgent(MainAgent.AgentScript agent) {
         agents.Add(agent);
+    }
+
+    //TODO: replace with future
+    public void logResult(Network network) {
+        (float, Network) res = archive.objectivesUpdate(network, population);
+        archive.archiveManagement(network, res.Item1, res.Item2);
+        print("archive size : " + archive.getArchiveSize());
     }
 
     private void addToPopulation(Network n) {

@@ -59,4 +59,9 @@ public class Network
     public void setEnd(Vector3 end) {
         this.end = end;
     }
+
+    public override String ToString() {
+        if (end == null) return "null";
+        return "q " + quality + " pos: " + end.x + ", " + end.y;
+    }
 }

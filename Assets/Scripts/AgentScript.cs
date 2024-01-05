@@ -123,6 +123,10 @@ namespace MainAgent {
             if (awake) { OnActionReceived(network.GetAction(time)); }
             if (time >= Population.episodeLength) {
                 // Once its time for the episode to stop we try get the next network and repeat
+                if (network != null) {
+                    network.setEnd(body.position);
+                    network.setQuality(0);
+                }
                 network = Population.instance.getNetwork();
                 awake = (network == null) ? false : true;
                 updateMaterial();
