@@ -26,13 +26,14 @@ public class Archive
         }
     }
 
-    public (float, Network) objectivesUpdate(Network n, List<Network> population) {
-        List<Network> near = new List<Network>();
+    public (float, Network) objectivesUpdate(Network n, List<Network> population) { 
         Network closest = null;
         float dist = float.MaxValue;
+        PriorityQueue<Network> near = new PriorityQueue<Network>(new NearnessComparer(n));
 
         foreach (Network network in archive) {
-            near.Add(network);
+            near.Enqueue(network);
+            while (near.Count > k) near.Dequeue();
             float d = n.distance(network);
             if (d < dist) {
                 closest = network;
@@ -41,22 +42,22 @@ public class Archive
         }
 
         foreach (Network network in population) {
-            near.Add(network);
+            near.Enqueue(network);
+            while (near.Count > k) near.Dequeue();
         }
 
-        near.Sort((x, y) => n.distance(x).CompareTo(n.distance(y)));
-        near.RemoveRange(k, near.Count - k);
         float novelty = 0;
         float count = near.Count;
         if (count == 0) return (0, null);
 
-        foreach (Network net in near) novelty += n.distance(net);
+        foreach (Network net in near.list) novelty += n.distance(net);
         novelty /= near.Count;
         return (novelty, closest);
     }
 
     public void archiveManagement(Network n, float novelty, Network closest) {
-        if (closest != null && n.getQuality() >= closest.getQuality()) {
+        Debug.Log("novelty: " + novelty);
+        if (closest != null && n.getQuality() > closest.getQuality()) {
             archive.Remove(closest);
             archive.Add(n);
         } else {

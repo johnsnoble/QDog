@@ -23,7 +23,7 @@ public class Population : MonoBehaviour
         for (int i = 0; i < 100; i++) {
             addToPopulation(new Network());
         }
-        archive = new Archive(15, 1000f);
+        archive = new Archive(15, 10f);
     }
 
     private void Update() {

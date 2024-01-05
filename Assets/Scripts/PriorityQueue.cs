@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,15 +6,16 @@ using UnityEngine;
 class PriorityQueue<T> {
     public List<T> list;
     public int Count { get { return list.Count; } }
+
     private IComparer<T> comparer;
-    public PriorityQueue() {
+    public PriorityQueue(object p) {
         list = new List<T>();
     }
 
     public PriorityQueue(IComparer<T> comparer) {
+        list = new List<T>();
         this.comparer = comparer;
     }
-
 
     public void Enqueue(T x) {
         list.Add(x);
