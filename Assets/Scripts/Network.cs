@@ -79,17 +79,32 @@ public class Network
 
         float x = endPos.x;
         float y = endPos.y;
-        double s = Math.Sqrt(x*x + y*y);
+        double alpha = Math.Atan(y / x);
 
-        double alpha = Math.Atan(y / Math.Sqrt(s));
-        double r = y / Math.Sin(180 - 2*alpha);
+        double r = y / Math.Sin(Math.PI - 2*alpha);
         double m = (r-x)/y;
         double c = y-x*m;
         desiredOrientation = (float) Math.Atan(x/Math.Abs(y-c));
 
-        if (y < 0) desiredOrientation = 180 - desiredOrientation;
+        if (y < 0) desiredOrientation = (float) (Math.PI - desiredOrientation);
+        if (x < 0) desiredOrientation = (float) (2*Math.PI + desiredOrientation);
+
+        //radians -> degrees
+        desiredOrientation = (float) (180/Math.PI * desiredOrientation);
+
 
         this.quality = -Math.Abs(desiredOrientation - endOrientation.y);
+
         return desiredOrientation;
+    }
+}
+
+class TestClass
+{
+    static void Main(string[] args)
+    {
+        // Display the number of command line arguments.
+
+        Console.WriteLine(args.Length);
     }
 }
