@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Runtime.InteropServices;
 
 public class Network
 {
@@ -68,5 +69,27 @@ public class Network
     public override String ToString() {
         if (endPos == null) return "null";
         return "q " + quality + " pos: " + endPos.x + ", " + endPos.y;
+    }
+
+    public float calculateQuality() {
+        if (endPos == null || endOrientation == null) 
+        throw new NullReferenceException("end values are not filled in before calculating quality");
+
+        float desiredOrientation;
+
+        float x = endPos.x;
+        float y = endPos.y;
+        double s = Math.Sqrt(x*x + y*y);
+
+        double alpha = Math.Atan(y / Math.Sqrt(s));
+        double r = y / Math.Sin(180 - 2*alpha);
+        double m = (r-x)/y;
+        double c = y-x*m;
+        desiredOrientation = (float) Math.Atan(x/Math.Abs(y-c));
+
+        if (y < 0) desiredOrientation = 180 - desiredOrientation;
+
+        this.quality = -Math.Abs(desiredOrientation - endOrientation.y);
+        return desiredOrientation;
     }
 }

@@ -125,9 +125,12 @@ namespace MainAgent {
                 // Once its time for the episode to stop we try get the next network and repeat
                 if (network != null) {
                     network.setEndPos(body.position);
-                    print("current orientation:" + this.transform.localRotation.eulerAngles);
-                    network.setEndOri(this.transform.localRotation.eulerAngles);
-                    network.setQuality(0);
+                    network.setEndOri(body.transform.localEulerAngles);
+
+                    print(this.GetHashCode() + " position:" + body.position + 
+                    "\n" + this.GetHashCode() + " orientation:" + body.transform.localEulerAngles);
+
+                    print("desired orientation" + network.calculateQuality());
                     Population.cde.Signal();
                 }
                 network = Population.instance.getNetwork();
