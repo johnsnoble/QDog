@@ -9,7 +9,8 @@ public class Network
     private int[,] genotype;
     private Dictionary<int, float> pMap;
     private float quality;
-    private Vector3 end;
+    private Vector3 endPos;
+    private Vector3 endOrientation; // contains x, y, z  (.y is orientation on plane)
 
     public Network() {
         action = new Action(12);
@@ -41,7 +42,7 @@ public class Network
     }
 
     public float distance(Network n) {
-        return Vector3.Distance(n.getEnd(), end);
+        return Vector3.Distance(n.getEnd(), endPos);
     }
 
     public float getQuality() {
@@ -49,19 +50,23 @@ public class Network
     }
 
     public Vector3 getEnd() {
-        return end;
+        return endPos;
     }
 
     public void setQuality(float quality) {
         this.quality = quality;
     }
 
-    public void setEnd(Vector3 end) {
-        this.end = end;
+    public void setEndPos(Vector3 end) {
+        this.endPos = end;
+    }
+
+    public void setEndOri(Vector3 end) {
+        this.endOrientation = end;
     }
 
     public override String ToString() {
-        if (end == null) return "null";
-        return "q " + quality + " pos: " + end.x + ", " + end.y;
+        if (endPos == null) return "null";
+        return "q " + quality + " pos: " + endPos.x + ", " + endPos.y;
     }
 }

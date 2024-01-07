@@ -124,7 +124,9 @@ namespace MainAgent {
             if (time >= Population.episodeLength) {
                 // Once its time for the episode to stop we try get the next network and repeat
                 if (network != null) {
-                    network.setEnd(body.position);
+                    network.setEndPos(body.position);
+                    print("current orientation:" + this.transform.localRotation.eulerAngles);
+                    network.setEndOri(this.transform.localRotation.eulerAngles);
                     network.setQuality(0);
                     Population.cde.Signal();
                 }

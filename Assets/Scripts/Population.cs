@@ -38,6 +38,7 @@ public class Population : MonoBehaviour
             print("archive size: " + archive.getArchiveSize());
             enabled = false;
             // TODO: Set next generation
+            
         }
     }
 
