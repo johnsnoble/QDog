@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
+using System.Numerics;
+using Vector3 = UnityEngine.Vector3;
+using Vector2 = UnityEngine.Vector2;
 
-public class Network
+
+public class Network  //: IEquatable<Network>, IComparable<Network>
 {
     private Action action;
     private int[,] genotype;
@@ -12,6 +16,9 @@ public class Network
     private float quality;
     private Vector3 endPos;
     private Vector3 endOrientation; // contains x, y, z  (.y is orientation on plane)
+    private float mutationProbability = 0.1f;
+
+    private int mutationRange; 
 
     public Network() {
         action = new Action(12);
@@ -29,6 +36,8 @@ public class Network
         pMap.Add(2, 0.5f);
         pMap.Add(3, 0.75f);
         pMap.Add(4, 1f);
+
+        this.mutationRange = (int) Math.Floor(1/this.mutationProbability);
     }
 
     public Action GetAction(float time) {
@@ -94,17 +103,26 @@ public class Network
 
 
         this.quality = -Math.Abs(desiredOrientation - endOrientation.y);
-
         return desiredOrientation;
     }
-}
 
-class TestClass
-{
-    static void Main(string[] args)
-    {
-        // Display the number of command line arguments.
+    public Network generateMutation(){
 
-        Console.WriteLine(args.Length);
+        Network mutated = new Network();
+
+        for (int i=0; i<12; i++) {
+            for (int j=0; j<2; j++) {
+                // mutate if randomly selected number from range is 1
+                if (UnityEngine.Random.Range(1, this.mutationRange) == 1) {
+                    int oldType = mutated.genotype[i, j];
+                    // ensure that mutated version is different
+                    do {
+                        mutated.genotype[i, j] = UnityEngine.Random.Range(0, 5);
+                    } while (oldType == mutated.genotype[i, j]);
+                }
+            }
+        }
+
+        return mutated;
     }
 }

@@ -7,14 +7,14 @@ class PriorityQueue<T> {
     public List<T> list;
     public int Count { get { return list.Count; } }
 
-    private IComparer<T> comparer;
-    public PriorityQueue(object p) {
+    private IComparer<T> comparator;
+    public PriorityQueue() {
         list = new List<T>();
     }
 
-    public PriorityQueue(IComparer<T> comparer) {
+    public PriorityQueue(IComparer<T> comparator) {
         list = new List<T>();
-        this.comparer = comparer;
+        this.comparator = comparator;
     }
 
     public void Enqueue(T x) {
@@ -23,7 +23,7 @@ class PriorityQueue<T> {
          
         while (i > 0) {
             int p = (i - 1) / 2;
-            if (comparer.Compare(list[p], x) < 1) break;
+            if (comparator.Compare(list[p], x) < 1) break;
             list[i] = list[p];
             i = p;
         }
@@ -40,9 +40,9 @@ class PriorityQueue<T> {
         while (i * 2 + 1 < Count) {
             int a = i * 2 + 1;
             int b = i * 2 + 2;
-            int c = b < Count && (comparer.Compare(list[b],list[a]) < 0) ? b : a;
+            int c = b < Count && (comparator.Compare(list[b],list[a]) < 0) ? b : a;
 
-            if (comparer.Compare(list[c],root) > -1) break;
+            if (comparator.Compare(list[c],root) > -1) break;
             list[i] = list[c];
             i = c;
         }

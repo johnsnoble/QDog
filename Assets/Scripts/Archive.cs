@@ -19,10 +19,10 @@ public class Archive
         public NearnessComparer(Network c) {
             this.c = c;
         }
-        public int Compare(Network x, Network y) {
-            float xd = c.distance(x);
-            float yd = c.distance(y);
-            return xd.CompareTo(yd);
+        public int Compare(Network a, Network b) {
+            float ad = c.distance(a);
+            float bd = c.distance(b);
+            return ad.CompareTo(bd);
         }
     }
 

@@ -37,8 +37,9 @@ public class Population : MonoBehaviour
             }
             print("archive size: " + archive.getArchiveSize());
             enabled = false;
-            // TODO: Set next generation
-            
+
+            // generateOffspring();
+            // TODO: delete half of new population based on quality
         }
     }
 
@@ -63,5 +64,24 @@ public class Population : MonoBehaviour
     private void addToPopulation(Network n) {
         population.Add(n);
         testQueue.Enqueue(n);
+    }
+
+    private void generateOffspring(){
+        // only mutation for now
+        // parents selected in tournament style
+        int i1;
+        int i2;
+        int oldPopCount = population.Count; 
+        for (int c = oldPopCount; initialPopulation > 0; c -= 1){
+            // pick 2 different indexes
+            do{
+                i1 = UnityEngine.Random.Range(0, oldPopCount - 1);
+                i2 = UnityEngine.Random.Range(0, oldPopCount - 1);
+            } while (i1 == i2);
+
+            Network winner = (population[i1].getQuality() >= population[i2].getQuality()) ? population[i1] : population[i2];
+            this.addToPopulation(winner.generateMutation());
+        }
+        
     }
 }
