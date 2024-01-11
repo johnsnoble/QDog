@@ -9,8 +9,8 @@ namespace MainAgent {
         public Transform fr3300, fl3300, br3300, bl3300, fr3400, fl3400, br3400, bl3400;
         public Transform fr3500, fl3500, br3500, bl3500;
         public HingeJoint[,] servo;
-        public float strength = 10000;
-        public float speed = 100;
+        public float strength = 3000;
+        public float speed = 400;
         public Transform plane;
         public Material awakeColour, asleepColour;
 

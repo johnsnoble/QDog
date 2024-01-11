@@ -9,7 +9,7 @@ public class Population : MonoBehaviour
 {
     // Start is called before the first frame update
     public static Population instance;
-    public static int episodeLength = 3;
+    public static float episodeLength = 4.5f;
     public static CountdownEvent cde;
 
     private ConcurrentQueue<Network> testQueue;
