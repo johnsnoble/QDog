@@ -12,11 +12,13 @@ public class Network  //: IEquatable<Network>, IComparable<Network>
 {
     private Action action;
     private int[,] genotype;
-    private Dictionary<int, float> pMap;
+    private static Dictionary<int, float> pMap = new Dictionary<int, float> {
+        { 0, 0f }, { 1, 0.25f }, { 2, 0.5f }, { 3, 0.75f }, { 4, 1f }
+    };
     private float quality;
     private Vector3 endPos;
     private Vector3 endOrientation; // contains x, y, z  (.y is orientation on plane)
-    private float mutationProbability = 0.1f;
+    private static float mutationProbability = 0.1f;
 
     private int mutationRange; 
 
@@ -29,15 +31,7 @@ public class Network  //: IEquatable<Network>, IComparable<Network>
             }
         }
 
-        pMap = new Dictionary<int, float>();
-        // 5 options for each parameter
-        pMap.Add(0, 0f);
-        pMap.Add(1, 0.25f);
-        pMap.Add(2, 0.5f);
-        pMap.Add(3, 0.75f);
-        pMap.Add(4, 1f);
-
-        this.mutationRange = (int) Math.Floor(1/this.mutationProbability);
+        this.mutationRange = (int) Math.Floor(1/Network.mutationProbability);
     }
 
     public Action GetAction(float time) {

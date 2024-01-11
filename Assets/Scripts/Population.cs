@@ -31,14 +31,18 @@ public class Population : MonoBehaviour
 
     private void Update() {
         if (cde.CurrentCount == 0) {
+
             foreach (Network n in population) {
                 (float, Network) res = archive.objectivesUpdate(n, population);
                 archive.archiveManagement(n, res.Item1, res.Item2);
             }
             print("archive size: " + archive.getArchiveSize());
-            enabled = false;
 
-            // generateOffspring();
+            populationManagement();
+            generateOffspring();
+            cde.Reset(testQueue.Count);
+
+            
             // TODO: delete half of new population based on quality
         }
     }
@@ -66,13 +70,22 @@ public class Population : MonoBehaviour
         testQueue.Enqueue(n);
     }
 
+    private void populationManagement(){
+        population.Sort((Network n1, Network n2) => n2.getQuality().CompareTo(n1.getQuality()));
+        if (population.Count % 2 == 1) throw new Exception("Irregular population size (odd)");
+        int mid = population.Count / 2;
+        population.RemoveRange(mid, mid);
+        print("population size reset: " + population.Count);
+        print("best quality" + population[0].getQuality());
+    }
+
     private void generateOffspring(){
         // only mutation for now
         // parents selected in tournament style
         int i1;
         int i2;
         int oldPopCount = population.Count; 
-        for (int c = oldPopCount; initialPopulation > 0; c -= 1){
+        for (int c = oldPopCount; c > 0; c -= 1){
             // pick 2 different indexes
             do{
                 i1 = UnityEngine.Random.Range(0, oldPopCount - 1);
@@ -82,6 +95,6 @@ public class Population : MonoBehaviour
             Network winner = (population[i1].getQuality() >= population[i2].getQuality()) ? population[i1] : population[i2];
             this.addToPopulation(winner.generateMutation());
         }
-        
+        print("offspring generated. new population size: " + population.Count);
     }
 }
