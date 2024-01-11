@@ -17,6 +17,7 @@ public class Population : MonoBehaviour
     private List<Network> population = new List<Network>();
     private Archive archive;
     private int initialPopulation = 100;
+    private bool replayTime = false;
 
     private void Awake() {
         instance = this;
@@ -32,16 +33,23 @@ public class Population : MonoBehaviour
     private void Update() {
         if (cde.CurrentCount == 0) {
 
-            foreach (Network n in population) {
-                (float, Network) res = archive.objectivesUpdate(n, population);
-                archive.archiveManagement(n, res.Item1, res.Item2);
+            if (replayTime) {
+                generateOffspring();
+                cde.Reset(testQueue.Count);
+            } else {
+                foreach (Network n in population) {
+                    (float, Network) res = archive.objectivesUpdate(n, population);
+                    archive.archiveManagement(n, res.Item1, res.Item2);
+                }
+                print("archive size: " + archive.getArchiveSize());
+
+                populationManagement();
+                for (int i = 0; i < 10; i++) {
+                    testQueue.Enqueue(population[i]);
+                }
+                cde.Reset(testQueue.Count);
             }
-            print("archive size: " + archive.getArchiveSize());
-
-            populationManagement();
-            generateOffspring();
-            cde.Reset(testQueue.Count);
-
+            replayTime = !replayTime;
             
             // TODO: delete half of new population based on quality
         }
